@@ -30,6 +30,18 @@ async function run() {
     const categoryCollection=client.db("PetAdoption").collection("Category");
     const campaignCollection=client.db("PetAdoption").collection("Campaign");
     const paymentCollection=client.db("PetAdoption").collection("Payment");
+    const userCollection2=client.db("PetAdoption").collection("Users");
+
+    app.post('/users',async(req,res)=>{
+        const user=req.body;
+        const query={email:user.email};
+        const existingUser=await userCollection2.findOne(query);
+        if(existingUser){
+            return res.send({message:'user already exists',insertedId:null})
+        }
+        const result=await userCollection2.insertOne(user);
+        res.send(result);
+    })
 
     app.get('/pet',async(req,res)=>{
         const result=await petCollection.find().toArray();
