@@ -78,6 +78,26 @@ async function run() {
         })
     }
 
+    const verifyAdmin = async (req, res, next) => {
+        const email = req.decoded.email;
+        const query = { email: email };
+        const user = await userCollection2.findOne(query);
+        const isAdmin = user?.role === true;
+        if (!isAdmin) {
+          return res.status(403).send({ message: 'forbidden access' });
+        }
+        next();
+      }
+
+      app.get('/users', verifyToken, verifyAdmin, async (req, res) => {
+        const result = await userCollection2.find().toArray();
+        res.send(result);
+      });
+
+      
+
+      
+
     app.post('/users',async(req,res)=>{
         const user=req.body;
         const query={email:user.email};
@@ -200,6 +220,18 @@ async function run() {
         const result=await petCollection.updateOne(filter,updatedDoc);
         res.send(result);
     })
+
+    app.patch('/users/admin/:id', verifyToken, verifyAdmin, async (req, res) => {
+        const id = req.params.id;
+        const filter = { _id: new ObjectId(id) };
+        const updatedDoc = {
+          $set: {
+            role: Boolean(1)
+          }
+        }
+        const result = await userCollection2.updateOne(filter, updatedDoc);
+        res.send(result);
+      })
 
     app.get('/payments',async(req,res)=>{
         const email=req.query.email;
