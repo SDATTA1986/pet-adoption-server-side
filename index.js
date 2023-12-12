@@ -201,11 +201,22 @@ async function run() {
         const result=await petCollection.find(query).toArray();
         res.send(result);
     })
+    app.get('/AllPets',async(req,res)=>{
+        
+        const result=await petCollection.find().toArray();
+        res.send(result);
+    })
 
     app.delete('/Pets/:id',async(req,res)=>{
         const id=req.params.id;
         const query={_id:new ObjectId(id)}
         const result=await petCollection.deleteOne(query);
+        res.send(result);
+    })
+    app.delete('/Campaigns/:id',async(req,res)=>{
+        const id=req.params.id;
+        const query={_id:new ObjectId(id)}
+        const result=await campaignCollection.deleteOne(query);
         res.send(result);
     })
 
@@ -218,6 +229,28 @@ async function run() {
             }
         }
         const result=await petCollection.updateOne(filter,updatedDoc);
+        res.send(result);
+    })
+    app.patch('/Campaigns/running/:id',async(req,res)=>{
+        const id=req.params.id;
+        const filter={_id: new ObjectId(id)};
+        const updatedDoc={
+            $set:{
+                CampaignStatus: Boolean(1)
+            }
+        }
+        const result=await campaignCollection.updateOne(filter,updatedDoc);
+        res.send(result);
+    })
+    app.patch('/Campaigns/paused/:id',async(req,res)=>{
+        const id=req.params.id;
+        const filter={_id: new ObjectId(id)};
+        const updatedDoc={
+            $set:{
+                CampaignStatus: Boolean(0)
+            }
+        }
+        const result=await campaignCollection.updateOne(filter,updatedDoc);
         res.send(result);
     })
 
